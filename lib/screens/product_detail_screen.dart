@@ -115,6 +115,51 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
+  // State variable for compatibility
+  ProductCompatibility? _compatibility;
+  bool _loadingCompatibility = false;
+
+  // Get ML-based compatibility when product loads
+  Future<void> _loadCompatibility() async {
+    if (_product == null) return;
+
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    if (!userProvider.hasCompletedSkinToneSelection) return;
+
+    setState(() {
+      _loadingCompatibility = true;
+    });
+
+    try {
+      final productProvider = Provider.of<ProductProvider>(context, listen: false);
+      final compatibility = await productProvider.getProductCompatibility(
+        _product!,
+        userProvider.userProfile.skinToneInfo,
+      );
+
+      if (mounted) {
+        setState(() {
+          _compatibility = compatibility;
+          _loadingCompatibility = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _loadingCompatibility = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_product != null && _compatibility == null && !_loadingCompatibility) {
+      _loadCompatibility();
+    }
+  }
+
   Widget _buildProductDetail() {
     if (_product == null) {
       return const Center(
@@ -123,11 +168,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
 
     final userProvider = Provider.of<UserProvider>(context);
-    final productProvider = Provider.of<ProductProvider>(context);
-    final compatibility = productProvider.getProductCompatibility(
-      _product!,
-      userProvider.userProfile.skinToneInfo,
-    );
 
     return CustomScrollView(
       slivers: [
@@ -187,8 +227,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     const SizedBox(height: 16),
                     
                     // Compatibility indicator
-                    if (userProvider.hasCompletedSkinToneSelection)
-                      CompatibilityBadge(compatibility: compatibility),
+                    if (userProvider.hasCompletedSkinToneSelection) 
+                      _loadingCompatibility
+                        ? const Center(child: CircularProgressIndicator())
+                        : _compatibility != null
+                          ? CompatibilityBadge(compatibility: _compatibility!)
+                          : const SizedBox.shrink(),
                     const SizedBox(height: 24),
                     
                     // Description
@@ -232,7 +276,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ],
                     
                     // Compatibility explanation
-                    if (userProvider.hasCompletedSkinToneSelection) ...[
+                    if (userProvider.hasCompletedSkinToneSelection && _compatibility != null) ...[
                       Text(
                         'Why this matches you',
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -241,7 +285,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        compatibility.reason,
+                        _compatibility!.reason,
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       const SizedBox(height: 32),

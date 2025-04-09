@@ -4,6 +4,7 @@ import '../providers/user_provider.dart';
 import '../constants/color_constants.dart';
 import '../models/skin_tone.dart';
 import 'onboarding/skin_tone_selection_screen.dart';
+import 'retailer_settings_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -302,6 +303,18 @@ class ProfileScreen extends StatelessWidget {
       ),
       child: Column(
         children: [
+          _buildSettingItem(
+            icon: Icons.store_outlined,
+            title: 'Retailer Settings',
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const RetailerSettingsScreen(),
+                ),
+              );
+            },
+          ),
+          const Divider(height: 1),
           _buildSettingItem(
             icon: Icons.notifications_outlined,
             title: 'Notifications',

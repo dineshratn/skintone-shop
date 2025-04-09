@@ -1,0 +1,27 @@
+name: skin_tone_shop
+description: A Flutter e-commerce app that recommends clothing based on users' skin tones with product aggregation from multiple retailers.
+version: 1.0.0+1
+
+environment:
+  sdk: '>=2.19.0 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  provider: ^6.0.5
+  url_launcher: ^6.1.10
+  shared_preferences: ^2.1.0
+  http: ^0.13.5
+  cached_network_image: ^3.2.3
+  intl: ^0.18.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icons/

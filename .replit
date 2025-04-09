@@ -19,10 +19,6 @@ args = "Flutter App Server"
 task = "workflow.run"
 args = "flutter_app"
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "ML Recommendation Server"
-
 [[workflows.workflow]]
 name = "Flutter App Server"
 author = "agent"
@@ -51,21 +47,6 @@ task = "packager.installForAll"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "flutter run -d web-server"
-
-[[workflows.workflow]]
-name = "ML Recommendation Server"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "packager.installForAll"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python ml_recommendation_engine.py"
-waitForPort = 5000
 
 [deployment]
 run = ["sh", "-c", "flutter run -d web-server --web-port=5000 --web-hostname=0.0.0.0"]

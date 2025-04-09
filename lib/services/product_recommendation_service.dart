@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import '../models/product.dart';
 import '../models/user_profile.dart';
 import '../models/retailer.dart';
+import '../models/skin_tone.dart';
 import '../utils/color_utils.dart';
 import 'retailer_service.dart';
 import 'retailer_manager.dart';

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_profile.dart';
+import '../models/skin_tone.dart';
 import '../constants/app_constants.dart';
 
 class UserProvider with ChangeNotifier {

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/product_provider.dart';
 import '../providers/user_provider.dart';
 import '../constants/app_constants.dart';
+import '../models/product.dart';
 import '../widgets/product_card.dart';
 import '../widgets/loading_indicator.dart';
 import '../widgets/error_view.dart';
@@ -192,20 +193,23 @@ class _SearchScreenState extends State<SearchScreen> {
       itemCount: productProvider.products.length,
       itemBuilder: (context, index) {
         final product = productProvider.products[index];
-        final compatibility = productProvider.getProductCompatibility(
-          product, userProvider.userProfile.skinToneInfo);
-        
-        return ProductCard(
-          product: product,
-          compatibility: compatibility,
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => ProductDetailScreen(
-                  productId: product.id,
-                  product: product,
-                ),
-              ),
+        return FutureBuilder<ProductCompatibility>(
+          future: productProvider.getProductCompatibility(
+            product, userProvider.userProfile.skinToneInfo),
+          builder: (context, snapshot) {
+            return ProductCard(
+              product: product,
+              compatibility: snapshot.data,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ProductDetailScreen(
+                      productId: product.id,
+                      product: product,
+                    ),
+                  ),
+                );
+              },
             );
           },
         );

@@ -292,19 +292,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemCount: productProvider.recommendedProducts.length,
                 itemBuilder: (context, index) {
                   final product = productProvider.recommendedProducts[index];
-                  final compatibility = productProvider.getProductCompatibility(
-                    product, userProvider.userProfile.skinToneInfo);
-                  
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: SizedBox(
-                      width: 180,
-                      child: ProductCard(
-                        product: product,
-                        compatibility: compatibility,
-                        onTap: () {},
-                      ),
-                    ),
+                  return FutureBuilder<ProductCompatibility>(
+                    future: productProvider.getProductCompatibility(
+                      product, userProvider.userProfile.skinToneInfo),
+                    builder: (context, snapshot) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: SizedBox(
+                          width: 180,
+                          child: ProductCard(
+                            product: product,
+                            compatibility: snapshot.data,
+                            onTap: () {},
+                          ),
+                        ),
+                      );
+                    },
                   );
                 },
               ),
@@ -359,13 +362,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   : productProvider.products.length,
               itemBuilder: (context, index) {
                 final product = productProvider.products[index];
-                final compatibility = productProvider.getProductCompatibility(
-                  product, userProvider.userProfile.skinToneInfo);
-                
-                return ProductCard(
-                  product: product,
-                  compatibility: compatibility,
-                  onTap: () {},
+                return FutureBuilder<ProductCompatibility>(
+                  future: productProvider.getProductCompatibility(
+                    product, userProvider.userProfile.skinToneInfo),
+                  builder: (context, snapshot) {
+                    return ProductCard(
+                      product: product,
+                      compatibility: snapshot.data,
+                      onTap: () {},
+                    );
+                  },
                 );
               },
             ),

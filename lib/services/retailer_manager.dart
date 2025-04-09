@@ -1,14 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../models/retailer.dart';
 import 'retailer_service.dart';
 import 'retailer_api_adapters.dart';
 
 class RetailerManager {
   final RetailerService _retailerService = RetailerService();
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   
   static const String _apiKeysStorageKey = 'retailer_api_keys';
   static const String _retailerSettingsKey = 'retailer_settings';
@@ -35,7 +33,8 @@ class RetailerManager {
   
   Future<void> _loadApiKeys() async {
     try {
-      final String? apiKeysJson = await _secureStorage.read(key: _apiKeysStorageKey);
+      final prefs = await SharedPreferences.getInstance();
+      final String? apiKeysJson = prefs.getString(_apiKeysStorageKey);
       if (apiKeysJson != null) {
         _apiKeys = Map<String, String>.from(jsonDecode(apiKeysJson));
       }
@@ -47,10 +46,8 @@ class RetailerManager {
   
   Future<void> _saveApiKeys() async {
     try {
-      await _secureStorage.write(
-        key: _apiKeysStorageKey,
-        value: jsonEncode(_apiKeys),
-      );
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_apiKeysStorageKey, jsonEncode(_apiKeys));
     } catch (e) {
       print('Error saving API keys: $e');
     }

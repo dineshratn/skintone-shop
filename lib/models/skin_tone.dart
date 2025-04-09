@@ -1,3 +1,62 @@
+class SkinToneInfo {
+  final String undertone; // warm, cool, neutral
+  final String depth; // light, medium, deep
+  final List<String> recommendedColors;
+  final List<String> notRecommendedColors;
+
+  SkinToneInfo({
+    required this.undertone,
+    required this.depth,
+    this.recommendedColors = const [],
+    this.notRecommendedColors = const [],
+  });
+
+  // Convert to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'undertone': undertone,
+      'depth': depth,
+      'recommendedColors': recommendedColors,
+      'notRecommendedColors': notRecommendedColors,
+    };
+  }
+
+  // Create from JSON
+  factory SkinToneInfo.fromJson(Map<String, dynamic> json) {
+    return SkinToneInfo(
+      undertone: json['undertone'] ?? '',
+      depth: json['depth'] ?? '',
+      recommendedColors: List<String>.from(json['recommendedColors'] ?? []),
+      notRecommendedColors: List<String>.from(json['notRecommendedColors'] ?? []),
+    );
+  }
+
+  // Create from SkinTone
+  factory SkinToneInfo.fromSkinTone(SkinTone skinTone) {
+    return SkinToneInfo(
+      undertone: skinTone.undertone,
+      depth: skinTone.depth,
+      recommendedColors: List<String>.from(skinTone.recommendedColors),
+      notRecommendedColors: List<String>.from(skinTone.notRecommendedColors),
+    );
+  }
+
+  // Check if the skin tone info is complete
+  bool get isComplete {
+    return undertone.isNotEmpty && depth.isNotEmpty;
+  }
+
+  // Create an empty skin tone info object
+  factory SkinToneInfo.empty() {
+    return SkinToneInfo(
+      undertone: '',
+      depth: '',
+      recommendedColors: [],
+      notRecommendedColors: [],
+    );
+  }
+}
+
 class SkinTone {
   final String id;
   final String name;

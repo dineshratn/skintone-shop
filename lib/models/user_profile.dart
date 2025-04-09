@@ -1,3 +1,5 @@
+import 'skin_tone.dart';
+
 class UserProfile {
   final String id;
   final String name;
@@ -65,65 +67,5 @@ class UserProfile {
            name.isNotEmpty && 
            email.isNotEmpty && 
            skinToneInfo.isComplete;
-  }
-}
-
-class SkinToneInfo {
-  final String undertone; // warm, cool, neutral
-  final String depth; // light, medium, deep
-  final List<String> recommendedColors;
-  final List<String> notRecommendedColors;
-
-  SkinToneInfo({
-    required this.undertone,
-    required this.depth,
-    this.recommendedColors = const [],
-    this.notRecommendedColors = const [],
-  });
-
-  SkinToneInfo copyWith({
-    String? undertone,
-    String? depth,
-    List<String>? recommendedColors,
-    List<String>? notRecommendedColors,
-  }) {
-    return SkinToneInfo(
-      undertone: undertone ?? this.undertone,
-      depth: depth ?? this.depth,
-      recommendedColors: recommendedColors ?? this.recommendedColors,
-      notRecommendedColors: notRecommendedColors ?? this.notRecommendedColors,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'undertone': undertone,
-      'depth': depth,
-      'recommendedColors': recommendedColors,
-      'notRecommendedColors': notRecommendedColors,
-    };
-  }
-
-  factory SkinToneInfo.fromJson(Map<String, dynamic> json) {
-    return SkinToneInfo(
-      undertone: json['undertone'] ?? '',
-      depth: json['depth'] ?? '',
-      recommendedColors: List<String>.from(json['recommendedColors'] ?? []),
-      notRecommendedColors: List<String>.from(json['notRecommendedColors'] ?? []),
-    );
-  }
-
-  // Create empty skin tone info
-  factory SkinToneInfo.empty() {
-    return SkinToneInfo(
-      undertone: '',
-      depth: '',
-      recommendedColors: [],
-      notRecommendedColors: [],
-    );
-  }
-
-  bool get isComplete {
-    return undertone.isNotEmpty && depth.isNotEmpty;
   }
 }

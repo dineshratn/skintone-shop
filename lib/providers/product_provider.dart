@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../models/product.dart';
 import '../models/user_profile.dart';
+import '../models/skin_tone.dart';
 import '../services/api_service.dart';
 import '../services/product_recommendation_service.dart';
 

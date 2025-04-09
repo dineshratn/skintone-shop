@@ -92,24 +92,27 @@ class _WishlistScreenState extends State<WishlistScreen> {
         itemCount: productProvider.wishlistProducts.length,
         itemBuilder: (context, index) {
           final product = productProvider.wishlistProducts[index];
-          final compatibility = productProvider.getProductCompatibility(
-            product, userProvider.userProfile.skinToneInfo);
-          
-          return ProductCard(
-            product: product,
-            compatibility: compatibility,
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => ProductDetailScreen(
-                    productId: product.id,
-                    product: product,
-                  ),
-                ),
+          return FutureBuilder<ProductCompatibility>(
+            future: productProvider.getProductCompatibility(
+              product, userProvider.userProfile.skinToneInfo),
+            builder: (context, snapshot) {
+              return ProductCard(
+                product: product,
+                compatibility: snapshot.data,
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => ProductDetailScreen(
+                        productId: product.id,
+                        product: product,
+                      ),
+                    ),
+                  );
+                },
+                showWishlistButton: true,
+                inWishlist: true,
               );
             },
-            showWishlistButton: true,
-            inWishlist: true,
           );
         },
       ),

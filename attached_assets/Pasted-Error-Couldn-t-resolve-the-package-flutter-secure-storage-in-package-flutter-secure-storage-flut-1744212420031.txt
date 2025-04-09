@@ -1,0 +1,60 @@
+Error: Couldn't resolve the package 'flutter_secure_storage' in 'package:flutter_secure_storage/flutter_secure_storage.dart'.
+lib/services/retailer_manager.dart:4:8: Error: Not found: 'package:flutter_secure_storage/flutter_secure_storage.dart'
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+       ^
+lib/services/retailer_manager.dart:11:9: Error: Type 'FlutterSecureStorage' not found.
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+        ^^^^^^^^^^^^^^^^^^^^
+lib/screens/profile_screen.dart:151:51: Error: Type 'SkinToneInfo' not found.
+  Widget _buildSkinToneInfo(BuildContext context, SkinToneInfo skinToneInfo) {
+                                                  ^^^^^^^^^^^^
+lib/screens/home_screen.dart:304:40: Error: The argument type 'Future<ProductCompatibility>' can't be assigned to the parameter type 'ProductCompatibility?'.
+ - 'Future' is from 'dart:async'.
+ - 'ProductCompatibility' is from 'package:skin_tone_shop/models/product.dart' ('lib/models/product.dart').
+                        compatibility: compatibility,
+                                       ^
+lib/screens/home_screen.dart:367:34: Error: The argument type 'Future<ProductCompatibility>' can't be assigned to the parameter type 'ProductCompatibility?'.
+ - 'Future' is from 'dart:async'.
+ - 'ProductCompatibility' is from 'package:skin_tone_shop/models/product.dart' ('lib/models/product.dart').
+                  compatibility: compatibility,
+                                 ^
+lib/services/retailer_manager.dart:11:9: Error: 'FlutterSecureStorage' isn't a type.
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+        ^^^^^^^^^^^^^^^^^^^^
+lib/services/retailer_manager.dart:11:53: Error: Couldn't find constructor 'FlutterSecureStorage'.
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+                                                    ^^^^^^^^^^^^^^^^^^^^
+lib/screens/search_screen.dart:200:26: Error: The argument type 'Future<ProductCompatibility>' can't be assigned to the parameter type 'ProductCompatibility?'.
+ - 'Future' is from 'dart:async'.
+ - 'ProductCompatibility' is from 'package:skin_tone_shop/models/product.dart' ('lib/models/product.dart').
+          compatibility: compatibility,
+                         ^
+lib/screens/profile_screen.dart:151:51: Error: 'SkinToneInfo' isn't a type.
+  Widget _buildSkinToneInfo(BuildContext context, SkinToneInfo skinToneInfo) {
+                                                  ^^^^^^^^^^^^
+lib/screens/wishlist_screen.dart:100:28: Error: The argument type 'Future<ProductCompatibility>' can't be assigned to the parameter type 'ProductCompatibility?'.
+ - 'Future' is from 'dart:async'.
+ - 'ProductCompatibility' is from 'package:skin_tone_shop/models/product.dart' ('lib/models/product.dart').
+            compatibility: compatibility,
+                           ^
+Unhandled exception:
+Unsupported operation: Unsupported invalid type InvalidType(<invalid>) (InvalidType). Encountered while compiling file:///C:/Users/admin/Documents/CascadeProjects/personal-website/ToneTailoredFashion/ToneTailoredFashion/lib/services/retailer_manager.dart, which contains the type: InvalidType(<invalid>).
+#0      ProgramCompiler._typeCompilationError (package:dev_compiler/src/kernel/compiler.dart:3471)
+#1      ProgramCompiler._emitType (package:dev_compiler/src/kernel/compiler.dart:3439)
+#2      ProgramCompiler._emitClassSignature.emitClassFieldSignature (package:dev_compiler/src/kernel/compiler.dart:1633)
+#3      ProgramCompiler._emitClassSignature (package:dev_compiler/src/kernel/compiler.dart:1774)
+#4      ProgramCompiler._emitClassDeclaration (package:dev_compiler/src/kernel/compiler.dart:1119)
+#5      ProgramCompiler._emitClass (package:dev_compiler/src/kernel/compiler.dart:1001)
+#6      List.forEach (dart:core-patch/growable_array.dart:421)
+#7      ProgramCompiler._emitLibrary (package:dev_compiler/src/kernel/compiler.dart:940)
+#8      List.forEach (dart:core-patch/growable_array.dart:421)
+#9      ProgramCompiler.emitModule (package:dev_compiler/src/kernel/compiler.dart:629)
+#10     IncrementalJavaScriptBundler.compile (package:frontend_server/src/javascript_bundle.dart:246)
+#11     FrontendCompiler.writeJavaScriptBundle (package:frontend_server/frontend_server.dart:877)
+<asynchronous suspension>
+#12     FrontendCompiler.compile (package:frontend_server/frontend_server.dart:693)
+<asynchronous suspension>
+#13     listenAndCompile.<anonymous closure> (package:frontend_server/frontend_server.dart:1401)
+<asynchronous suspension>
+the Dart compiler exited unexpectedly.
+Failed to compile application.

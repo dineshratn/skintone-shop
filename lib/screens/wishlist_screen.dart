@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
 import '../providers/product_provider.dart';
 import '../constants/color_constants.dart';
+import '../models/product.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/product_card.dart';
 import '../widgets/loading_indicator.dart';

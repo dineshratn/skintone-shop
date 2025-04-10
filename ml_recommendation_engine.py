@@ -733,7 +733,7 @@ def calculate_compatibility():
 
 @app.route('/api/analyze-skin-tone', methods=['POST'])
 def analyze_skin_tone():
-    """Analyze a user's skin tone from an image using OpenAI vision model"""
+    """Analyze a user's skin tone and gender/age from an image using OpenAI vision model"""
     if not OPENAI_API_KEY:
         return jsonify({
             'error': 'OpenAI API key not configured. Unable to analyze skin tone from image.'
@@ -747,17 +747,21 @@ def analyze_skin_tone():
         if not image_base64:
             return jsonify({'error': 'No image data provided'}), 400
             
-        # Create prompt for OpenAI
+        # Create enhanced prompt for OpenAI that includes gender/age detection
         prompt = """
-        Analyze this image of a person's skin and provide a detailed skin tone analysis.
+        Analyze this image of a person and provide a detailed analysis of their skin tone and demographic information.
         Identify the following attributes:
         1. Undertone (warm, cool, or neutral)
         2. Depth (light, medium, or deep)
+        3. Gender classification (male, female, or unspecified)
+        4. Age classification (child, teen, adult, or senior)
         
         Respond with a JSON object in this exact format:
         {
             "undertone": "warm|cool|neutral",
             "depth": "light|medium|deep",
+            "gender": "male|female|unspecified",
+            "age_group": "child|teen|adult|senior",
             "description": "Brief 1-2 sentence explanation of the skin tone characteristics"
         }
         
@@ -785,7 +789,7 @@ def analyze_skin_tone():
                 }
             ],
             response_format={"type": "json_object"},
-            max_tokens=150
+            max_tokens=200
         )
         
         # Parse the response

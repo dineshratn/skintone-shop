@@ -4,6 +4,8 @@ class SkinToneInfo {
   final List<String> recommendedColors;
   final List<String> notRecommendedColors;
   final String description; // Human-readable description from AI analysis
+  final String gender; // male, female, unspecified
+  final String ageGroup; // child, teen, adult, senior
 
   SkinToneInfo({
     required this.undertone,
@@ -11,6 +13,8 @@ class SkinToneInfo {
     this.recommendedColors = const [],
     this.notRecommendedColors = const [],
     this.description = '',
+    this.gender = 'unspecified',
+    this.ageGroup = 'adult',
   });
 
   // Convert to JSON
@@ -21,6 +25,8 @@ class SkinToneInfo {
       'recommendedColors': recommendedColors,
       'notRecommendedColors': notRecommendedColors,
       'description': description,
+      'gender': gender,
+      'ageGroup': ageGroup,
     };
   }
 
@@ -32,6 +38,8 @@ class SkinToneInfo {
       recommendedColors: List<String>.from(json['recommendedColors'] ?? []),
       notRecommendedColors: List<String>.from(json['notRecommendedColors'] ?? []),
       description: json['description'] ?? '',
+      gender: json['gender'] ?? 'unspecified',
+      ageGroup: json['age_group'] ?? json['ageGroup'] ?? 'adult',
     );
   }
 
@@ -59,6 +67,8 @@ class SkinToneInfo {
       recommendedColors: [],
       notRecommendedColors: [],
       description: '',
+      gender: 'unspecified',
+      ageGroup: 'adult',
     );
   }
 }

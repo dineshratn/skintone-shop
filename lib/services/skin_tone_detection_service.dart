@@ -54,19 +54,25 @@ class SkinToneDetectionService {
         final List<dynamic> notRecommendedColors = data['notRecommendedColors'] ?? [];
         final String description = data['description'] ?? '';
         
+        // Extract gender and age data (new fields)
+        final String gender = data['gender'] ?? 'unspecified';
+        final String ageGroup = data['age_group'] ?? 'adult';
+        
         // Convert dynamic lists to string lists
         final List<String> recommendedColorsList = 
             recommendedColors.map((color) => color.toString()).toList();
         final List<String> notRecommendedColorsList = 
             notRecommendedColors.map((color) => color.toString()).toList();
         
-        // Create the skin tone info
+        // Create the skin tone info with gender and age
         return SkinToneInfo(
           undertone: undertone,
           depth: depth,
           recommendedColors: recommendedColorsList,
           notRecommendedColors: notRecommendedColorsList,
           description: description,
+          gender: gender,
+          ageGroup: ageGroup,
         );
       } else {
         // Log the error
@@ -128,6 +134,8 @@ class SkinToneDetectionService {
         undertone: undertone,
         depth: depth,
         recommendedColors: recommendedColors,
+        gender: 'unspecified', // Default value since basic detection can't determine gender
+        ageGroup: 'adult',     // Default value since basic detection can't determine age
       );
     } catch (e) {
       // Log the error for debugging but don't show to user
@@ -145,6 +153,8 @@ class SkinToneDetectionService {
       undertone: 'neutral',
       depth: 'medium',
       recommendedColors: _generateRecommendedColors('neutral', 'medium'),
+      gender: 'unspecified',
+      ageGroup: 'adult',
     );
   }
   

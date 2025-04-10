@@ -5,6 +5,9 @@ import '../models/skin_tone.dart';
 import '../services/api_service.dart';
 import '../services/product_recommendation_service.dart';
 
+// Ensure we're using ProductCompatibility from models/product.dart
+// to avoid any class conflicts
+
 class ProductProvider with ChangeNotifier {
   final ApiService _apiService = ApiService();
   final ProductRecommendationService _recommendationService = ProductRecommendationService();

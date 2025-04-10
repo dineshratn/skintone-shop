@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/product.dart';
+import '../models/product.dart' show Product, ProductCompatibility;
 import '../models/user_profile.dart';
 import '../models/retailer.dart';
 import '../models/skin_tone.dart';
@@ -51,6 +51,8 @@ class ProductRecommendationService {
             'depth': skinToneInfo.depth,
             'recommendedColors': skinToneInfo.recommendedColors,
             'notRecommendedColors': skinToneInfo.notRecommendedColors,
+            'gender': skinToneInfo.gender,
+            'ageGroup': skinToneInfo.ageGroup,
           },
         }),
       );
@@ -97,6 +99,8 @@ class ProductRecommendationService {
             'depth': skinToneInfo.depth,
             'recommendedColors': skinToneInfo.recommendedColors,
             'notRecommendedColors': skinToneInfo.notRecommendedColors,
+            'gender': skinToneInfo.gender,
+            'ageGroup': skinToneInfo.ageGroup,
           },
         }),
       );
@@ -179,6 +183,18 @@ class ProductRecommendationService {
       score -= 5; // Single color products have no alternatives
     }
     
+    // Gender-specific adjustments
+    if (skinToneInfo.gender != 'unspecified') {
+      if (product.gender != 'unisex' && product.gender != skinToneInfo.gender) {
+        score -= 20; // Reduce score for products not intended for user's gender
+      }
+    }
+    
+    // Age-specific adjustments
+    if (skinToneInfo.ageGroup == 'child' && product.category == 'Professional') {
+      score -= 15; // Children don't need professional attire
+    }
+    
     // Ensure score is within bounds
     if (score > 100) score = 100;
     if (score < 0) score = 0;
@@ -187,6 +203,20 @@ class ProductRecommendationService {
     if (compatibleColors.isNotEmpty) {
       reason = 'This ${product.category.toLowerCase()} comes in ${_formatColorList(compatibleColors)}, '
           'which complement your ${skinToneInfo.undertone} ${skinToneInfo.depth} skin tone.';
+          
+      // Add gender-specific reasoning if applicable
+      if (skinToneInfo.gender != 'unspecified') {
+        if (product.gender == skinToneInfo.gender || product.gender == 'unisex') {
+          reason += ' This item is designed for ${skinToneInfo.gender} wear.';
+        } else {
+          reason += ' Note that this item is designed for ${product.gender} wear.';
+        }
+      }
+      
+      // Add age-specific reasoning if applicable
+      if (skinToneInfo.ageGroup != 'adult') {
+        reason += ' This style is appropriate for your ${skinToneInfo.ageGroup} age group.';
+      }
     } else if (incompatibleColors.isNotEmpty) {
       reason = '${_formatColorList(incompatibleColors)} may not be the most flattering colors '
           'for your ${skinToneInfo.undertone} ${skinToneInfo.depth} skin tone.';
@@ -386,3 +416,5 @@ class ProductWithCompatibility {
     required this.reason,
   });
 }
+
+// Using ProductCompatibility class from models/product.dart

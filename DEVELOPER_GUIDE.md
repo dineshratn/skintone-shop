@@ -1,6 +1,6 @@
 # SkinTone Shop Developer Guide
 
-## Overview
+## Overview###
 
 SkinTone Shop is a Flutter-powered e-commerce fashion application that provides intelligent, personalized clothing recommendations based on users' skin tones. It aggregates products from multiple retailers and applies machine learning to suggest items that complement each user's unique skin tone characteristics.
 

@@ -2,7 +2,7 @@
 
 This guide provides step-by-step instructions for adding new retailer APIs to the SkinTone Shop application. It's intended for developers who need to extend the app's product sources by integrating with additional e-commerce platforms.
 
-## Table of Contents
+## Table of Contentss
 
 1. [Overview of the Retailer Integration System](#overview-of-the-retailer-integration-system)
 2. [Integration Workflow](#integration-workflow)

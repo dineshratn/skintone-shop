@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/user_provider.dart';
 import '../../constants/app_constants.dart';
 import '../../constants/color_constants.dart';
-import 'skin_tone_selection_screen.dart';
+import 'photo_capture_screen.dart';
 import '../home_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -59,10 +59,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     // Create a basic user profile
     await userProvider.createUser('Guest User', '');
     
-    // Navigate to skin tone selection screen
+    // Navigate to photo capture screen
     navigator.push(
       MaterialPageRoute(
-        builder: (_) => const SkinToneSelectionScreen(),
+        builder: (_) => const PhotoCaptureScreen(),
       ),
     );
   }

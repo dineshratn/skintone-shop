@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
 import '../constants/color_constants.dart';
 import '../models/skin_tone.dart';
-import 'onboarding/skin_tone_selection_screen.dart';
+import 'onboarding/photo_capture_screen.dart';
 import 'retailer_settings_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -29,8 +29,8 @@ class ProfileScreen extends StatelessWidget {
                   _buildUserInfoCard(context, user.name, user.email),
                   const SizedBox(height: 24),
                   
-                  // Skin tone section
-                  _buildSectionTitle(context, 'Your Skin Tone Profile'),
+                  // Style profile section
+                  _buildSectionTitle(context, 'Your Style Profile'),
                   const SizedBox(height: 16),
                   
                   if (userProvider.hasCompletedSkinToneSelection)
@@ -197,7 +197,7 @@ class ProfileScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '$depthText skin with $undertoneText undertone',
+                      'Your personalized color palette',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -208,7 +208,7 @@ class ProfileScreen extends StatelessWidget {
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (_) => const SkinToneSelectionScreen(),
+                            builder: (_) => const PhotoCaptureScreen(),
                           ),
                         );
                       },
@@ -273,7 +273,7 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Select your skin tone to get personalized clothing recommendations.',
+              'Upload a photo to get personalized clothing recommendations based on your unique features.',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),
@@ -283,11 +283,11 @@ class ProfileScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (_) => const SkinToneSelectionScreen(),
+                      builder: (_) => const PhotoCaptureScreen(),
                     ),
                   );
                 },
-                child: const Text('Select Skin Tone'),
+                child: const Text('Upload a Photo'),
               ),
             ),
           ],

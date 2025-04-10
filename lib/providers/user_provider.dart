@@ -19,22 +19,33 @@ class UserProvider with ChangeNotifier {
 
   // Initialize user from local storage
   Future<void> initUser() async {
-    _setLoading(true);
+    _isLoading = true;
     try {
       final prefs = await SharedPreferences.getInstance();
       
       // Check if onboarding is complete
-      _isOnboardingComplete = prefs.getBool('isOnboardingComplete') ?? false;
+      final isOnboardingComplete = prefs.getBool('isOnboardingComplete') ?? false;
       
       // Check if user profile exists
       final userProfileJson = prefs.getString(AppConstants.userProfileKey);
+      UserProfile userProfile = UserProfile.empty();
       if (userProfileJson != null) {
-        _userProfile = UserProfile.fromJson(json.decode(userProfileJson));
+        userProfile = UserProfile.fromJson(json.decode(userProfileJson));
       }
       
-      _setLoading(false);
+      // Update state without calling notifyListeners during init
+      _isOnboardingComplete = isOnboardingComplete;
+      _userProfile = userProfile;
+      _isLoading = false;
+      
+      // Now notify listeners after everything is updated
+      // This avoids setState during build issues
+      Future.microtask(() => notifyListeners());
     } catch (e) {
-      _setError('Failed to initialize user: $e');
+      _error = 'Failed to initialize user: $e';
+      _isLoading = false;
+      print('UserProvider Error: $_error');
+      Future.microtask(() => notifyListeners());
     }
   }
   
@@ -44,7 +55,8 @@ class UserProvider with ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isOnboardingComplete', true);
       _isOnboardingComplete = true;
-      notifyListeners();
+      // Use microtask to avoid setState during build issues
+      Future.microtask(() => notifyListeners());
     } catch (e) {
       _setError('Failed to save onboarding status: $e');
     }
@@ -153,9 +165,13 @@ class UserProvider with ChangeNotifier {
         AppConstants.userProfileKey,
         json.encode(_userProfile.toJson()),
       );
-      notifyListeners();
+      // Use microtask to avoid setState during build issues
+      Future.microtask(() => notifyListeners());
     } catch (e) {
-      _setError('Failed to save user profile: $e');
+      _error = 'Failed to save user profile: $e';
+      _isLoading = false;
+      print('UserProvider Error: $_error');
+      Future.microtask(() => notifyListeners());
     }
   }
 
@@ -165,18 +181,21 @@ class UserProvider with ChangeNotifier {
     if (loading) {
       _error = '';
     }
-    notifyListeners();
+    // Use microtask to avoid setState during build issues
+    Future.microtask(() => notifyListeners());
   }
 
   void _setError(String errorMessage) {
     _error = errorMessage;
     _isLoading = false;
     print('UserProvider Error: $errorMessage');
-    notifyListeners();
+    // Use microtask to avoid setState during build issues
+    Future.microtask(() => notifyListeners());
   }
 
   void clearError() {
     _error = '';
-    notifyListeners();
+    // Use microtask to avoid setState during build issues
+    Future.microtask(() => notifyListeners());
   }
 }

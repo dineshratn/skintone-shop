@@ -9,6 +9,12 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
+from openai import OpenAI
+
+# the newest OpenAI model is "gpt-4o" which was released May 13, 2024.
+# do not change this unless explicitly requested by the user
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+openai_client = OpenAI(api_key=OPENAI_API_KEY)
 
 app = Flask(__name__)
 
@@ -485,7 +491,67 @@ def get_recommendations(product_df, user_features, model, top_n=10):
     return recommendations
 
 def generate_recommendation_reason(product_row, user_features):
-    """Generate a human-readable reason for the recommendation"""
+    """Generate a human-readable reason for the recommendation using OpenAI"""
+    try:
+        # Check if OpenAI API key is available
+        if not OPENAI_API_KEY:
+            return generate_basic_recommendation_reason(product_row, user_features)
+            
+        undertone = user_features.get('undertone', 'neutral')
+        depth = user_features.get('depth', 'medium')
+        category = product_row.get('category', 'item')
+        
+        # Get product details for more personalized reasoning
+        product_id = product_row.get('id', '')
+        score = product_row.get('compatibility_score', 50)
+        
+        # Determine color tones in the product
+        color_families = {k: v for k, v in product_row.items() if k.startswith('color_family_') and v > 0}
+        color_tones = {k.replace('color_tone_', ''): v for k, v in product_row.items() if k.startswith('color_tone_') and v > 0}
+        
+        # Create a prompt for OpenAI
+        prompt = f"""
+        Generate a short, friendly explanation (2-3 sentences) for why this clothing item would look good with this skin tone.
+        
+        Product category: {category}
+        Main colors: {', '.join([k for k in color_families.keys()])}
+        Color undertones: {', '.join([k for k in color_tones.keys()])}
+        User skin undertone: {undertone}
+        User skin depth: {depth}
+        Compatibility score: {score}/100
+        
+        The explanation should feel natural and helpful, focusing on why these colors complement the person's skin tone.
+        Do not mention the numeric score, technical color terms like 'undertone', or overly technical fashion terminology.
+        Keep it conversational, brief, and focused on what will look good on them.
+        """
+        
+        # Call OpenAI API
+        response = openai_client.chat.completions.create(
+            model="gpt-4o", # the newest OpenAI model is "gpt-4o" which was released May 13, 2024
+            messages=[
+                {"role": "system", "content": "You are a fashion expert specializing in skin tone color matching."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=100,
+            temperature=0.7
+        )
+        
+        # Get the response
+        reason = response.choices[0].message.content.strip()
+        
+        # Clean up any quotation marks that might be in the response
+        reason = reason.replace('"', '').replace("'", "")
+        
+        return reason
+        
+    except Exception as e:
+        # Log the error for debugging
+        print(f"Error generating recommendation with OpenAI: {str(e)}")
+        # Fall back to basic recommendation reasoning
+        return generate_basic_recommendation_reason(product_row, user_features)
+        
+def generate_basic_recommendation_reason(product_row, user_features):
+    """Generate a basic human-readable reason for the recommendation (fallback method)"""
     undertone = user_features.get('undertone', 'neutral')
     depth = user_features.get('depth', 'medium')
     
@@ -603,16 +669,57 @@ def calculate_compatibility():
         # Ensure score is within bounds
         score = max(0, min(100, score))
         
-        # Generate reason
+        # Try to generate reason with OpenAI if available
+        try:
+            if OPENAI_API_KEY:
+                # Create product row format for the OpenAI function
+                product_row = {
+                    'id': product.get('id', ''),
+                    'category': category,
+                    'compatibility_score': score
+                }
+                
+                # Add color family and tone information
+                for color in colors:
+                    family = get_color_family(color)
+                    product_row[f'color_family_{family}'] = 1.0
+                    
+                    tone = get_color_tone(color)
+                    product_row[f'color_tone_{tone}'] = 1.0
+                
+                # Get enhanced reason
+                reason = generate_recommendation_reason(product_row, user_info)
+            else:
+                # Fallback to basic reasoning
+                if score >= 80:
+                    level = "High"
+                    reason = f"This {category.lower()} perfectly complements your {undertone} skin tone."
+                elif score >= 50:
+                    level = "Medium"
+                    reason = f"This {category.lower()} works reasonably well with your {undertone} skin tone."
+                else:
+                    level = "Low"
+                    reason = f"This {category.lower()} may not be the most flattering for your {undertone} skin tone."
+        except Exception as e:
+            print(f"Error generating compatibility reason: {str(e)}")
+            # Fallback to basic reasoning
+            if score >= 80:
+                level = "High"
+                reason = f"This {category.lower()} perfectly complements your {undertone} skin tone."
+            elif score >= 50:
+                level = "Medium"
+                reason = f"This {category.lower()} works reasonably well with your {undertone} skin tone."
+            else:
+                level = "Low"
+                reason = f"This {category.lower()} may not be the most flattering for your {undertone} skin tone."
+                
+        # Determine compatibility level
         if score >= 80:
             level = "High"
-            reason = f"This {category.lower()} perfectly complements your {undertone} skin tone."
         elif score >= 50:
             level = "Medium"
-            reason = f"This {category.lower()} works reasonably well with your {undertone} skin tone."
         else:
             level = "Low"
-            reason = f"This {category.lower()} may not be the most flattering for your {undertone} skin tone."
         
         return jsonify({
             'productId': product.get('id', ''),
@@ -624,5 +731,91 @@ def calculate_compatibility():
     except Exception as e:
         return jsonify({'error': f'Error calculating compatibility: {str(e)}'}), 500
 
+@app.route('/api/analyze-skin-tone', methods=['POST'])
+def analyze_skin_tone():
+    """Analyze a user's skin tone from an image using OpenAI vision model"""
+    if not OPENAI_API_KEY:
+        return jsonify({
+            'error': 'OpenAI API key not configured. Unable to analyze skin tone from image.'
+        }), 400
+        
+    try:
+        # Get base64 encoded image from request
+        data = request.json
+        image_base64 = data.get('image', '')
+        
+        if not image_base64:
+            return jsonify({'error': 'No image data provided'}), 400
+            
+        # Create prompt for OpenAI
+        prompt = """
+        Analyze this image of a person's skin and provide a detailed skin tone analysis.
+        Identify the following attributes:
+        1. Undertone (warm, cool, or neutral)
+        2. Depth (light, medium, or deep)
+        
+        Respond with a JSON object in this exact format:
+        {
+            "undertone": "warm|cool|neutral",
+            "depth": "light|medium|deep",
+            "description": "Brief 1-2 sentence explanation of the skin tone characteristics"
+        }
+        
+        Only respond with the JSON object and nothing else. Do not include any preamble or explanation.
+        """
+        
+        # Call OpenAI Vision API
+        response = openai_client.chat.completions.create(
+            model="gpt-4o", # the newest OpenAI model is "gpt-4o" which was released May 13, 2024
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": prompt
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{image_base64}"
+                            }
+                        }
+                    ]
+                }
+            ],
+            response_format={"type": "json_object"},
+            max_tokens=150
+        )
+        
+        # Parse the response
+        result = json.loads(response.choices[0].message.content)
+        
+        # Add the matching skin tone ID based on undertone and depth
+        undertone = result.get('undertone', 'neutral')
+        depth = result.get('depth', 'medium')
+        skin_tone_id = f"{undertone}_{depth}"
+        
+        # Find the matching predefined skin tone for additional information
+        matching_skin_tone = None
+        for skin_tone in SKIN_TONES:
+            if skin_tone['id'] == skin_tone_id:
+                matching_skin_tone = skin_tone
+                break
+        
+        # Add recommended colors if we found a matching skin tone
+        if matching_skin_tone:
+            result['recommendedColors'] = matching_skin_tone.get('recommendedColors', [])
+            result['notRecommendedColors'] = matching_skin_tone.get('notRecommendedColors', [])
+            result['id'] = skin_tone_id
+            result['name'] = matching_skin_tone.get('name', '')
+        
+        return jsonify(result)
+    
+    except Exception as e:
+        # Log the error
+        print(f"Error analyzing skin tone: {str(e)}")
+        return jsonify({'error': f'Failed to analyze skin tone: {str(e)}'}), 500
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5001)

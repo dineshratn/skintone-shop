@@ -10,7 +10,7 @@ import 'retailer_manager.dart';
 
 class ProductRecommendationService {
   // The API URL for our ML recommendation engine
-  static const String apiUrl = 'http://localhost:5000/api';
+  static const String apiUrl = 'http://localhost:5001/api';
   
   // Service instances
   final RetailerService _retailerService = RetailerService();

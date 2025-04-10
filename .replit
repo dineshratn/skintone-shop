@@ -13,14 +13,14 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Flutter App Server"
+args = "Flutter Web Server"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "flutter_app"
+args = "ML Recommendation API"
 
 [[workflows.workflow]]
-name = "Flutter App Server"
+name = "Flutter Web Server"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -35,7 +35,7 @@ args = "flutter run -d web-server --web-port=5000 --web-hostname=0.0.0.0"
 waitForPort = 5000
 
 [[workflows.workflow]]
-name = "flutter_app"
+name = "ML Recommendation API"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -46,7 +46,8 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "flutter run -d web-server"
+args = "python ml_recommendation_engine.py"
+waitForPort = 5001
 
 [deployment]
 run = ["sh", "-c", "flutter run -d web-server --web-port=5000 --web-hostname=0.0.0.0"]
@@ -54,3 +55,7 @@ run = ["sh", "-c", "flutter run -d web-server --web-port=5000 --web-hostname=0.0
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 5001
+externalPort = 3000

@@ -121,8 +121,24 @@ class _PhotoCaptureScreenState extends State<PhotoCaptureScreen> {
     }
     
     try {
-      // Detect skin tone from the image
-      SkinToneInfo skinToneInfo = await _skinToneDetectionService.detectSkinToneFromImage(_selectedImage!);
+      // Try to detect skin tone using AI first
+      SkinToneInfo skinToneInfo;
+      
+      try {
+        // Use the AI-powered analyzer with OpenAI
+        skinToneInfo = await _skinToneDetectionService.detectSkinToneWithAI(_selectedImage!);
+        print('AI skin tone detection successful: ${skinToneInfo.undertone} ${skinToneInfo.depth}');
+        
+        if (skinToneInfo.description.isNotEmpty) {
+          print('AI description: ${skinToneInfo.description}');
+        }
+      } catch (aiError) {
+        // Log AI error but don't show to user
+        print('AI skin tone detection failed, falling back to basic analysis: $aiError');
+        
+        // Fall back to basic image processing
+        skinToneInfo = await _skinToneDetectionService.detectSkinToneFromImage(_selectedImage!);
+      }
       
       if (!skinToneInfo.isComplete) {
         throw Exception('Could not detect skin tone from image');
@@ -158,7 +174,7 @@ class _PhotoCaptureScreenState extends State<PhotoCaptureScreen> {
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _errorMessage = 'Error processing image: $e';
+          _errorMessage = 'Error processing image. Please try again or use a clearer photo.';
         });
       }
     }
@@ -327,12 +343,26 @@ class _PhotoCaptureScreenState extends State<PhotoCaptureScreen> {
                 
                 // Loading indicator
                 if (_isLoading) ...[
-                  const Center(
+                  Center(
                     child: Column(
                       children: [
-                        CircularProgressIndicator(),
-                        SizedBox(height: 16),
-                        Text('Analyzing photo...'),
+                        const CircularProgressIndicator(),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Analyzing photo with AI...',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Identifying your ideal color palette',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade700,
+                          ),
+                        ),
                       ],
                     ),
                   ),

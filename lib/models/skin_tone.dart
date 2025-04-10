@@ -3,12 +3,14 @@ class SkinToneInfo {
   final String depth; // light, medium, deep
   final List<String> recommendedColors;
   final List<String> notRecommendedColors;
+  final String description; // Human-readable description from AI analysis
 
   SkinToneInfo({
     required this.undertone,
     required this.depth,
     this.recommendedColors = const [],
     this.notRecommendedColors = const [],
+    this.description = '',
   });
 
   // Convert to JSON
@@ -18,6 +20,7 @@ class SkinToneInfo {
       'depth': depth,
       'recommendedColors': recommendedColors,
       'notRecommendedColors': notRecommendedColors,
+      'description': description,
     };
   }
 
@@ -28,6 +31,7 @@ class SkinToneInfo {
       depth: json['depth'] ?? '',
       recommendedColors: List<String>.from(json['recommendedColors'] ?? []),
       notRecommendedColors: List<String>.from(json['notRecommendedColors'] ?? []),
+      description: json['description'] ?? '',
     );
   }
 
@@ -38,6 +42,7 @@ class SkinToneInfo {
       depth: skinTone.depth,
       recommendedColors: List<String>.from(skinTone.recommendedColors),
       notRecommendedColors: List<String>.from(skinTone.notRecommendedColors),
+      description: skinTone.description,
     );
   }
 
@@ -53,6 +58,7 @@ class SkinToneInfo {
       depth: '',
       recommendedColors: [],
       notRecommendedColors: [],
+      description: '',
     );
   }
 }

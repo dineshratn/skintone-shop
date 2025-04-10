@@ -1,13 +1,18 @@
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
+import 'dart:convert';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image/image.dart' as img;
+import 'package:http/http.dart' as http;
 import '../models/skin_tone.dart';
 
 class SkinToneDetectionService {
+  // The ML API url for skin tone analysis
+  static const String _mlApiUrl = 'http://localhost:5001/api/analyze-skin-tone';
+  
   // The minimum percentage of skin pixels required for a valid detection
   static const double _minSkinPixelPercentage = 0.05;
   
@@ -22,7 +27,65 @@ class SkinToneDetectionService {
   // Sample size reduction to improve performance
   static const int _sampleReduction = 4;
   
-  /// Detects skin tone information from an image file
+  /// Detects skin tone information from an image file using the ML recommendation engine
+  Future<SkinToneInfo> detectSkinToneWithAI(File imageFile) async {
+    try {
+      // Read the image file as bytes
+      final Uint8List bytes = await imageFile.readAsBytes();
+      
+      // Convert to base64
+      final String base64Image = base64Encode(bytes);
+      
+      // Call the ML API
+      final response = await http.post(
+        Uri.parse(_mlApiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'image': base64Image}),
+      );
+      
+      if (response.statusCode == 200) {
+        // Parse the response
+        final data = jsonDecode(response.body);
+        
+        // Extract data from the response
+        final String undertone = data['undertone'] ?? 'neutral';
+        final String depth = data['depth'] ?? 'medium';
+        final List<dynamic> recommendedColors = data['recommendedColors'] ?? [];
+        final List<dynamic> notRecommendedColors = data['notRecommendedColors'] ?? [];
+        final String description = data['description'] ?? '';
+        
+        // Convert dynamic lists to string lists
+        final List<String> recommendedColorsList = 
+            recommendedColors.map((color) => color.toString()).toList();
+        final List<String> notRecommendedColorsList = 
+            notRecommendedColors.map((color) => color.toString()).toList();
+        
+        // Create the skin tone info
+        return SkinToneInfo(
+          undertone: undertone,
+          depth: depth,
+          recommendedColors: recommendedColorsList,
+          notRecommendedColors: notRecommendedColorsList,
+          description: description,
+        );
+      } else {
+        // Log the error
+        print('ML API error: ${response.statusCode} - ${response.body}');
+        
+        // Fall back to basic detection
+        return detectSkinToneFromImage(imageFile);
+      }
+    } catch (e) {
+      // Log the error
+      print('AI skin tone detection error: $e');
+      
+      // Fall back to basic detection
+      return detectSkinToneFromImage(imageFile);
+    }
+  }
+  
+  /// Detects skin tone information from an image file using basic image processing
+  /// This is a fallback if the ML API fails
   Future<SkinToneInfo> detectSkinToneFromImage(File imageFile) async {
     try {
       // Handle web platform differently
